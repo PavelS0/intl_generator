@@ -1,5 +1,8 @@
 Intl_generator
 ====
+This is fork of intl_generator with added ability to extract messages from AngularDart templates.
+
+Original description:
 
 This is a fork of intl_translation to have an up to date version.
 
