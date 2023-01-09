@@ -84,7 +84,7 @@ main(List<String> args) {
           "don't need to be specified for messages.");
 
   parser.parse(args);
-  var dartFiles = args.where((x) => x.endsWith("dart")).toList();
+  var dartFiles = args.where((x) => x.endsWith("dart") || x.endsWith(".html")).toList();
   var jsonFiles = args.where((x) => x.endsWith(".arb")).toList();
   dartFiles.addAll(linesFromFile(sourcesListFile));
   jsonFiles.addAll(linesFromFile(translationsListFile));

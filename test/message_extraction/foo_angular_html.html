@@ -1,0 +1,11 @@
+<div>
+    <a href="#" > 
+        <h1> {{ Intl.message('bark', examples: const {'x': 'bark'}) }} </h1>
+        <h1> {{ foo ? Intl.message('foo', examples: const {'x': 'foo'}) : ""  }} </h1>
+        <h1> {{ variable }} </h1>
+
+        <my-component href="asd" [text]="bar ? Intl.message('bar', examples: const {'x': 'bar'}) : Intl.message('baz', examples: const {'x': 'baz'})"></my-component>
+        <my-other-component [value]="Intl.message('meow', examples: const {'x': 'meow'})"></my-other-component>
+        <my-other-component [value]="variable"></my-other-component>
+    </a>
+</div>
