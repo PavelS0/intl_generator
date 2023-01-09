@@ -2,6 +2,13 @@ Intl_generator
 ====
 This is fork of intl_generator with added ability to extract messages from AngularDart templates.
 
+To activate:
+dart pub global activate -sgit https://github.com/PavelS0/intl_generator.git
+
+Run:
+dart pub global run intl_generator:extract_to_arb --output-dir=target/directory
+          my_program.dart more_of_my_program.dart
+          
 Original description:
 
 This is a fork of intl_translation to have an up to date version.
@@ -20,7 +27,7 @@ results need to be incorporated.
 
 To extract messages, run the `extract_to_arb.dart` program.
 
-      pub run intl_generator:extract_to_arb --output-dir=target/directory
+      dart pub global run intl_generator:extract_to_arb --output-dir=target/directory
           my_program.dart more_of_my_program.dart
 
 This will produce a file `intl_messages.arb` with the messages from all of these
@@ -34,7 +41,7 @@ This expects to receive a series of files, one per
 locale.
 
 ```
-pub run intl_generator:generate_from_arb --generated-file-prefix=<prefix>
+dart pub global intl_generator:generate_from_arb --generated-file-prefix=<prefix>
     <my_dart_files> <translated_ARB_files>
 ```
 
