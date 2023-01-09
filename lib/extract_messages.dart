@@ -28,7 +28,7 @@ import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:analyzer/src/dart/ast/ast.dart';
 import 'package:analyzer/src/dart/ast/constant_evaluator.dart';
 import 'package:intl_generator/src/intl_message.dart';
-
+import 'package:ngast/ngast.dart';
 export 'src/arb_generation.dart';
 
 /// A function that takes a message and does something useful with it.
@@ -101,15 +101,72 @@ class MessageExtraction {
     String contents = fileContent;
     origin = filepath;
     // Optimization to avoid parsing files we're sure don't contain any messages.
-    if (contents.contains('Intl.')) {
-      root = _parseCompilationUnit(contents, origin!);
+    if (filepath.contains('.html')) {
+      return _extractAngularHtml(fileContent, filepath, transformer);
     } else {
-      return {};
+      if (contents.contains('Intl.')) {
+        root = _parseCompilationUnit(contents, origin!);
+      } else {
+        return {};
+      }
+      var visitor = new MessageFindingVisitor(this);
+      visitor.generateNameAndArgs = transformer;
+      root.accept(visitor);
+      return visitor.messages;
     }
-    var visitor = new MessageFindingVisitor(this);
-    visitor.generateNameAndArgs = transformer;
-    root.accept(visitor);
-    return visitor.messages;
+    
+  }
+
+  void _extractSnippets(List<TemplateAst> ls, List<String> to) {
+    for (final e in ls) {
+      if (e is ParsedElementAst) {
+        for (final p in e.properties) {
+          final v = p.value;
+          if (v != null && v.contains('Intl.')) {
+            to.add(v);
+          }
+        }
+        if (e.childNodes.isNotEmpty) {
+          _extractSnippets(e.childNodes, to);
+        }
+      } else  if (e is ParsedInterpolationAst) {
+          final v = e.value;
+          if (v.contains('Intl.')) {
+            to.add(v);
+          }
+        to.add(e.value);
+      }
+    }
+  }
+
+  Map<String, MainMessage> _extractAngularHtml(String fileContent, String filepath, [bool transformer = false]) {
+    late List<TemplateAst> tree; 
+    try {
+      tree = parse(fileContent, sourceUrl: filepath, desugar: false);
+    } catch (e) {
+      throw ArgumentError('Parsing errors in $filepath: $e');
+    } 
+
+    final snippets = <String>[];
+    _extractSnippets(tree, snippets);
+    final map = <String, MainMessage>{}; 
+    String src = '';
+    int i = 0;
+    for (final s in snippets) {
+      src += "dynamic message$i() => $s;\n";
+      i++;
+    }
+    
+    if (i > 0) {
+      root = _parseCompilationUnit(src, origin!);
+
+      var visitor = new MessageFindingVisitor(this);
+      visitor.generateNameAndArgs = transformer;
+      root.accept(visitor);
+      map.addAll(visitor.messages);
+    }
+
+    return map;
   }
 
   CompilationUnit _parseCompilationUnit(String contents, String origin) {

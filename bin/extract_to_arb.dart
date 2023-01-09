@@ -91,7 +91,7 @@ main(List<String> args) {
     allMessages["@@last_modified"] = new DateTime.now().toIso8601String();
   }
 
-  var dartFiles = args.where((x) => x.endsWith(".dart")).toList();
+  var dartFiles = args.where((x) => x.endsWith(".dart") || x.endsWith(".html")).toList();
   dartFiles.addAll(linesFromFile(sourcesListFile));
   for (var arg in dartFiles) {
     var messages = extraction.parseFile(new File(arg), transformer);
